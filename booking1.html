@@ -1,31 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full Width Calendar Booking</title>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <title>Centered Calendar</title>
     <style>
-        body {
-            margin: 25px;
-            font-family: Arial, sans-serif;
-            background-color: white;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        #calendar-container {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .calendar {
+            width: 100%;
+            max-width: 1500px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%;
-            margin-top: 20px;
         }
 
-        #calendar {
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
             width: 100%;
-            max-width: 100%;
-            margin: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .day {
+            padding: 8px;
+        }
+
+        .calendar-dates {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 8px;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        .date {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .date:hover {
+            background-color: #dcdcdc;
+        }
+
+        .bookable {
+            background-color: #dff0d8;
+        }
+
+        .not-bookable {
+            background-color: #f2dede;
+            cursor: not-allowed;
         }
 
         /* Modal Style */
@@ -40,7 +112,6 @@
             z-index: 1000;
             overflow: auto;
             padding-top: 50px;
-            transition: opacity 0.5s ease;
         }
 
         #modal-content {
@@ -48,10 +119,10 @@
             margin: 5% auto;
             padding: 30px;
             width: 50%;
+            max-width: 500px;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
-            transition: transform 0.3s ease;
         }
 
         #closeModal {
@@ -78,14 +149,14 @@
         .form-group {
             margin: 15px 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
         }
 
         .form-group label {
             font-weight: bold;
             color: #555;
-            width: 120px;
-            margin-right: 15px;
+            margin-bottom: 8px;
         }
 
         .form-group input,
@@ -98,13 +169,6 @@
             border-radius: 8px;
             box-sizing: border-box;
             font-size: 16px;
-            transition: border 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #4CAF50;
         }
 
         .form-group button {
@@ -116,177 +180,230 @@
             cursor: pointer;
             width: 100%;
             font-size: 16px;
-            transition: background-color 0.3s ease;
         }
 
         .form-group button:hover {
             background-color: #45a049;
         }
+
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            background-color: #e0e0e0;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .tab-button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Warning Modal */
+        #warningModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .warning-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 300px;
+        }
+
+        .close-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .close-button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
-
 <body>
-    <div id="calendar-container">
-        <div id="calendar"></div>
+    <div class="calendar">
+        <div class="calendar-header">
+            <button class="prev-month" onclick="changeMonth(-1)">Prev</button>
+            <span class="month-year" id="monthYear">November 2024</span>
+            <button class="next-month" onclick="changeMonth(1)">Next</button>
+        </div>
+        <div class="tab-container">
+            <button class="tab-button active" id="miniHallTab" onclick="switchHall('miniHall')">Mini Hall</button>
+            <button class="tab-button" id="mainHallTab" onclick="switchHall('mainHall')">Main Hall</button>
+        </div> 
+        <div class="calendar-days">
+            <div class="day">Sun</div>
+            <div class="day">Mon</div>
+            <div class="day">Tue</div>
+            <div class="day">Wed</div>
+            <div class="day">Thu</div>
+            <div class="day">Fri</div>
+            <div class="day">Sat</div>
+        </div>
+        <div class="calendar-dates" id="datesContainer"></div>
     </div>
 
-    <!-- Modal -->
+    <!-- Booking Modal -->
     <div id="modal">
         <div id="modal-content">
             <span id="closeModal">&times;</span>
-            <h2 class="modal-title">Booking Details</h2>
-            <div class="form-group">
-                <label for="bookingDate">Date:</label>
-                <input type="text" id="bookingDate" readonly>
-            </div>
-            <div class="form-group">
-                <label for="morningSlot">Morning Slot:</label>
-                <input type="text" id="morningSlot" readonly>
-            </div>
-            <div class="form-group">
-                <label for="eveningSlot">Evening Slot:</label>
-                <input type="text" id="eveningSlot" readonly>
-            </div>
-            <div class="form-group">
-                <button onclick="closeModal()">Close</button>
-            </div>
+            <h2 class="modal-title">Book Appointment for <span id="modal-date" style="color: #4CAF50;"></span></h2>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" required />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" required />
+                </div>
+                <div class="form-group">
+                    <label for="timeSlot">Time Slot:</label>
+                    <select id="timeSlot" required>
+                        <option value="1">10am-2:30pm</option>
+                        <option value="2">3:30pm-8pm</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Submit</button>
+                </div>
+            </form>
         </div>
     </div>
 
-   <script>
-    const availabilityData = {
-    mainHall: {
-        "2024-11-09": { morning: true, evening: false },
-        "2024-11-12": { morning: true, evening: true },
-        "2024-11-15": { morning: false, evening: true },
-        "2024-11-18": { morning: true, evening: false },
-        "2024-11-23": { morning: true, evening: true },
-        "2024-11-25": { morning: true, evening: false },
-        "2024-11-28": { morning: false, evening: true },
-    },
-    miniHall: {
-        "2024-11-09": { morning: false, evening: true },
-        "2024-11-11": { morning: true, evening: true },
-        "2024-11-14": { morning: true, evening: false },
-        "2024-11-17": { morning: false, evening: true },
-        "2024-11-19": { morning: true, evening: true },
-        "2024-11-24": { morning: true, evening: true },
-        "2024-11-27": { morning: false, evening: true },
-    }
-};
+    <!-- Warning Modal -->
+    <div id="warningModal">
+        <div class="warning-container">
+            <h3>This date is not available.</h3>
+            <p>Please choose another day.</p>
+            <button class="close-button" onclick="closeWarning()">Close</button>
+        </div>
+    </div>
 
-let currentHall = 'mainHall';
+    <script>
+        const availabilityData = {
+            '2024-11-10': false,
+            '2024-11-12': true,
+            '2024-11-15': false
+        };
 
-function createCalendar(hallData) {
-    const calendarEl = document.getElementById('calendar');
-    return new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        dateClick: function(info) {
-            const dateClicked = info.dateStr;
-            const date = new Date(dateClicked);
-            const month = date.getMonth();
+        let selectedDate = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const datesContainer = document.getElementById('datesContainer');
 
-            // For November (month 10), check availability data
-            if (month === 10 && hallData[dateClicked]) {
-                // November and date exists in availabilityData
-                openBookingModal(dateClicked, currentHall === 'mainHall' ? 'Main Hall' : 'Mini Hall', hallData[dateClicked]);
-            } else if (month !== 10) {
-                // For other months, show both slots available
-                openBookingModal(dateClicked, currentHall === 'mainHall' ? 'Main Hall' : 'Mini Hall', { morning: true, evening: true });
-            } else {
-                // If unavailable date clicked, show alert
-                alert('This date is unavailable!');
+        function renderCalendar() {
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+            datesContainer.innerHTML = '';
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                datesContainer.appendChild(emptyCell);
             }
-        },
-        events: function(info, successCallback) {
-            const events = [];
-            Object.keys(hallData).forEach(date => {
-                const availableSlots = hallData[date];
 
-                // Morning Slot (9 AM - 3 PM)
-                events.push({
-                    title: availableSlots.morning ? '9 AM - 3 PM - Available' : '9 AM - 3 PM - Booked',
-                    start: date,
-                    backgroundColor: 'white',
-                    textColor: availableSlots.morning ? 'green' : 'red',
-                    allDay: true,
-                });
+            for (let day = 1; day <= totalDays; day++) {
+                const dateCell = document.createElement('div');
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                dateCell.className = 'date';
 
-                // Evening Slot (4 PM - 10 PM)
-                events.push({
-                    title: availableSlots.evening ? '4 PM - 10 PM - Available' : '4 PM - 10 PM - Booked',
-                    start: date,
-                    backgroundColor: 'white',
-                    textColor: availableSlots.evening ? 'green' : 'red',
-                    allDay: true,
-                });
-            });
-            successCallback(events);
-        },
-        eventClick: function(info) {
-            const event = info.event;
-            const dateClicked = event.startStr;
-            const isAvailableMorning = event.title.includes('9 AM - 3 PM - Available');
-            const isAvailableEvening = event.title.includes('4 PM - 10 PM - Available');
+                if (availabilityData[dateStr]) {
+                    dateCell.classList.add('bookable');
+                    dateCell.onclick = () => openBookingModal(dateStr);
+                } else if (availabilityData[dateStr] === false) {
+                    dateCell.classList.add('not-bookable');
+                    dateCell.onclick = () => openWarning();
+                }
 
-            if (event.textColor === 'red') {
-                // Show alert for unavailable date
-                alert('This date is unavailable!');
-            } else {
-                openBookingModal(dateClicked, currentHall === 'mainHall' ? 'Main Hall' : 'Mini Hall', {
-                    morning: isAvailableMorning,
-                    evening: isAvailableEvening,
-                });
+                dateCell.textContent = day;
+                datesContainer.appendChild(dateCell);
             }
+
+            document.getElementById('monthYear').textContent = `${monthNames[currentMonth]} ${currentYear}`;
         }
-    });
-}
 
-let calendar = createCalendar(availabilityData[currentHall]);
-calendar.render();
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear -= 1;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear += 1;
+            }
+            renderCalendar();
+        }
 
-document.getElementById('hallSelect').addEventListener('change', function () {
-    currentHall = this.value;
-    calendar.destroy();
-    calendar = createCalendar(availabilityData[currentHall]);
-    calendar.render();
-});
+        function openBookingModal(date) {
+            selectedDate = date;
+            document.getElementById('modal-date').textContent = date;
+            document.getElementById('modal').style.display = 'block';
+        }
 
-function openBookingModal(date, hallName, availableSlots) {
-    document.getElementById('modal').style.display = 'block';
-    document.getElementById('modal').style.opacity = 1;
-    document.getElementById('modal-date').innerText = date;
-    document.getElementById('hall-name').innerText = hallName;
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
 
-    const timeSlotSelect = document.getElementById('timeSlot');
-    timeSlotSelect.innerHTML = '';
+        function openWarning() {
+            document.getElementById('warningModal').style.display = 'flex';
+        }
 
-    // Add both morning and evening slots as available
-    if (availableSlots.morning) {
-        const morningOption = document.createElement('option');
-        morningOption.value = 'morning';
-        morningOption.text = 'Morning (9 AM - 3 PM)';
-        timeSlotSelect.add(morningOption);
-    }
-    if (availableSlots.evening) {
-        const eveningOption = document.createElement('option');
-        eveningOption.value = 'evening';
-        eveningOption.text = 'Evening (4 PM - 10 PM)';
-        timeSlotSelect.add(eveningOption);
-    }
-}
+        function closeWarning() {
+            document.getElementById('warningModal').style.display = 'none';
+        }
 
-document.getElementById('closeModal').onclick = function () {
-    document.getElementById('modal').style.display = 'none';
-};
+        document.getElementById('closeModal').onclick = closeModal;
+        window.onclick = (event) => {
+            if (event.target === document.getElementById('modal')) {
+                closeModal();
+            }
+        };
 
-window.onclick = function (event) {
-    if (event.target == document.getElementById('modal')) {
-        document.getElementById('modal').style.display = 'none';
-    }
-};
+        function switchHall(hall) {
+            const miniHallTab = document.getElementById('miniHallTab');
+            const mainHallTab = document.getElementById('mainHallTab');
 
-   </script>
+            if (hall === 'miniHall') {
+                miniHallTab.classList.add('active');
+                mainHallTab.classList.remove('active');
+            } else {
+                mainHallTab.classList.add('active');
+                miniHallTab.classList.remove('active');
+            }
+
+            // Adjust this part to change availability based on the hall
+            console.log(`Switched to ${hall}`);
+            renderCalendar();
+        }
+
+        renderCalendar();
+    </script>
 </body>
-
 </html>

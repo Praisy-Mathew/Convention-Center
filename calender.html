@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centered Calendar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .calendar {
+            width: 100%;
+            max-width: 1500px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .day {
+            padding: 8px;
+        }
+
+        .calendar-dates {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 8px;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        .date {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+
+        .date:hover {
+            background-color: #dcdcdc;
+        }
+
+        /* Modal Style */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow: auto;
+            padding-top: 50px;
+            transition: opacity 0.5s ease;
+        }
+
+        #modal-content {
+            background: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            width: 50%;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        #closeModal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #closeModal:hover,
+        #closeModal:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .form-group {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #4CAF50;
+        }
+
+        .form-group button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calendar">
+        <div class="calendar-header">
+            <button class="prev-month" onclick="changeMonth(-1)">Prev</button>
+            <span class="month-year" id="monthYear">November 2024</span>
+            <button class="next-month" onclick="changeMonth(1)">Next</button>
+        </div>
+        <div class="tab-container">
+            <span style="margin-top: 15px; font-style: italic;">Select the Hall:</span>
+            <button class="tab-button active" id="miniHallTab" onclick="switchHall('miniHall')">Mini Hall</button>
+            <button class="tab-button" id="mainHallTab" onclick="switchHall('mainHall')">Main Hall</button>
+        </div> 
+        <div class="calendar-days">
+            <div class="day">Sun</div>
+            <div class="day">Mon</div>
+            <div class="day">Tue</div>
+            <div class="day">Wed</div>
+            <div class="day">Thu</div>
+            <div class="day">Fri</div>
+            <div class="day">Sat</div>
+        </div>
+        <div class="calendar-dates" id="datesContainer">
+            <!-- Dates will be populated here -->
+        </div>
+    </div>
+    
+    <!-- Booking Modal -->
+    <div id="modal" style="display: none;">
+        <div id="modal-content">
+            <span id="closeModal">&times;</span>
+            <h2 class="modal-title">Book Appointment for <span id="modal-date" style="color: #4CAF50;"></span></h2>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" required />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" required />
+                </div>
+                <div class="form-group">
+                    <label for="timeSlot">Time Slot:</label>
+                    <select id="timeSlot" required>
+                        <option value="" disabled selected>Select a time slot</option>
+                    </select>
+                    
+                </div>
+                <div class="form-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    
+    <!-- Styled Warning Popup -->
+    <div id="warningModal" style="display: none;">
+        <div class="warning-overlay"></div>
+        <div class="warning-container">
+            <div class="warning-content">
+                <h3>This date is not available.</h3>
+                <p>Please choose another day.</p>
+                <button class="close-button" onclick="closeWarning()">Close</button>
+            </div>
+        </div>
+    </div>
+    
+
+    <style>
+        .date {
+    cursor: pointer;
+    padding: 10px;
+    margin: 5px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.date.bookable {
+    background-color: #e7ffe7; /* Green for bookable dates */
+}
+
+.date.not-bookable {
+    background-color: #ffcccc; /* Red for non-bookable dates */
+    cursor: not-allowed;
+}
+
+.date.not-bookable:hover {
+    background-color: #ff9999;
+}
+
+    </style>
+
+    <script>
+        // Data for hall availability
+        const availabilityData = {
+            miniHall: {
+              
+        "2024-11-05": { morning: 'available', evening: 'booked' },
+        "2024-11-10": { morning: 'booked', evening: 'available' },
+        "2024-11-15": { morning: 'available', evening: 'available' },
+        "2024-11-18": { morning: 'booked', evening: 'booked' },
+        "2024-11-23": { morning: 'available', evening: 'booked' },
+        "2024-11-28": { morning: 'available', evening: 'available' },
+        "2024-12-03": { morning: 'booked', evening: 'available' }
+            },
+            mainHall: {
+                "2024-11-07": { morning: 'booked', evening: 'available' },
+        "2024-11-12": { morning: 'available', evening: 'booked' },
+        "2024-11-20": { morning: 'booked', evening: 'available' },
+        "2024-11-22": { morning: 'available', evening: 'booked' },
+        "2024-11-25": { morning: 'available', evening: 'available' },
+        "2024-11-30": { morning: 'booked', evening: 'available' },
+        "2024-12-05": { morning: 'available', evening: 'available' }
+            }
+        };
+    
+        let selectedDate = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let currentHall = 'miniHall'; // Default hall
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    
+        function generateCalendar() {
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const calendarContainer = document.getElementById("datesContainer");
+    const monthYear = document.getElementById("monthYear");
+
+    calendarContainer.innerHTML = '';
+    monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+    // Generate blank cells for days before the first day of the month
+    for (let i = 0; i < firstDayOfMonth; i++) {
+        calendarContainer.innerHTML += `<div class="date"></div>`;
+    }
+
+    // Generate calendar dates with booking details
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        const hallData = availabilityData[currentHall][dateKey] || null;
+        let badgesHTML = '';
+
+        let isBookable = true; // Default to bookable
+        let isWarning = false; // Default to no warning
+
+        if (hallData) {
+            // Add badges for morning and evening availability
+            badgesHTML += hallData.morning === 'available'
+                ? `<span class="badge badge-available">Morning Available</span>`
+                : `<span class="badge badge-booked">Morning Booked</span>`;
+
+            badgesHTML += hallData.evening === 'available'
+                ? `<span class="badge badge-available">Evening Available</span>`
+                : `<span class="badge badge-booked">Evening Booked</span>`;
+
+            // Check if both slots are booked
+            if (hallData.morning === 'booked' && hallData.evening === 'booked') {
+                isBookable = false;
+                isWarning = true;
+            }
+        }
+
+        const dateClass = isBookable ? 'date bookable' : 'date not-bookable';
+        const onClickHandler = isWarning
+            ? `showWarningPopup('${dateKey}')`
+            : `handleDateClick('${dateKey}')`;
+
+        calendarContainer.innerHTML += `
+            <div class="${dateClass}" onclick="${isBookable || isWarning ? onClickHandler : ''}">
+                ${i}${badgesHTML}
+            </div>`;
+    }
+}
+
+// Show the modal for bookable dates
+function handleDateClick(dateKey) {
+    // Open the booking modal
+    const modal = document.getElementById("modal");
+    modal.style.display = "block";
+
+    // Populate modal with selected date (customize as needed)
+    document.getElementById("selectedDate").textContent = dateKey;
+}
+
+// Show the warning modal for non-bookable dates
+function showWarningPopup(dateKey) {
+    const warningModal = document.getElementById("warningModal");
+    warningModal.style.display = "block";
+
+    // Optionally, show the date in the warning modal
+    document.getElementById("warningDate").textContent = dateKey;
+}
+
+        function openBookingModal(date) {
+            selectedDate = date;
+            const hallData = availabilityData[currentHall][date] || null;
+        
+            if (hallData) {
+                document.getElementById('modal-date').textContent = date;
+        
+                const timeSlotSelect = document.getElementById('timeSlot');
+                timeSlotSelect.innerHTML = ''; // Clear previous options
+        
+                // Add available slots dynamically
+                if (hallData.morning === 'available') {
+                    const morningOption = document.createElement('option');
+                    morningOption.value = '1';
+                    morningOption.textContent = '10am-2:30pm';
+                    timeSlotSelect.appendChild(morningOption);
+                }
+        
+                if (hallData.evening === 'available') {
+                    const eveningOption = document.createElement('option');
+                    eveningOption.value = '2';
+                    eveningOption.textContent = '3:30pm-8pm';
+                    timeSlotSelect.appendChild(eveningOption);
+                }
+        
+                if (timeSlotSelect.options.length === 0) {
+                    const noSlotOption = document.createElement('option');
+                    noSlotOption.value = '';
+                    noSlotOption.textContent = 'No available slots';
+                    noSlotOption.disabled = true;
+                    noSlotOption.selected = true;
+                    timeSlotSelect.appendChild(noSlotOption);
+                }
+        
+                document.getElementById('modal').style.display = 'block';
+            }
+        }
+        
+        function openWarningModal() {
+            document.getElementById('warningModal').style.display = 'block';
+        }
+    
+        function closeWarning() {
+            document.getElementById('warningModal').style.display = 'none';
+        }
+    
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar();
+        }
+    
+        function switchHall(hall) {
+            currentHall = hall;
+            document.getElementById('miniHallTab').classList.remove('active');
+            document.getElementById('mainHallTab').classList.remove('active');
+            document.getElementById(`${hall}Tab`).classList.add('active');
+            generateCalendar();
+        }
+    
+        document.getElementById('closeModal').onclick = closeModal;
+        generateCalendar();
+    
+        // Initial load for Mini Hall
+        switchHall('miniHall');
+
+
+    </script>
+    
+    <style>
+        .date {
+            display: flex;
+            flex-direction: column; /* Arrange content vertically */
+            align-items: center; /* Center-align content horizontally */
+            justify-content: center; /* Center-align content vertically */
+            height: 80px; /* Adjust the height as needed */
+            border: 0px solid #ccc;
+            margin: 2px;
+            position: relative;
+            font-size: 14px;
+            overflow: hidden; /* Ensures badges stay within the cell */
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 17px;
+
+        }
+        
+        .badge {
+            display: block;
+            padding: 3px 6px;
+            margin: 2px 0; /* Vertical spacing between badges */
+            font-size: 12px;
+            border-radius: 4px;
+            text-align: center;
+            color: #fff;
+            white-space: nowrap; /* Prevent badges from wrapping */
+        }
+        
+        .badge-available {
+            background-color: #28a745; /* Green for available */
+        }
+        
+        .badge-booked {
+            background-color: #dc3545; /* Red for booked */
+        }
+        
+        /* For dates without badges, center the number */
+        .date:not(.bookable) {
+            justify-content: center;
+            align-items: center;
+        }
+        
+        
+        .bookable { background-color: #dff0d8; } /* Available dates in green */
+        .not-bookable { background-color: #f2dede; cursor: not-allowed; } /* Unavailable dates in red */
+        
+        /* Modal Styling */
+        #modal, #warningModal { display: none; /* Add your modal styles here */ }
+    
+        /* Warning Modal Styles */
+        .warning-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+    
+        .warning-container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1001;
+        }
+    
+        .warning-content h3 {
+            color: #FF6B6B;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+    
+        .warning-content p {
+            margin: 0;
+            font-size: 14px;
+            color: #333;
+        }
+    
+        .close-button {
+            margin-top: 15px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #FF6B6B;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        .close-button:hover {
+            background-color: #ff4c4c;
+        }
+        .badge {
+        display: inline-block;
+        padding: 3px 8px;
+        font-size: 12px;
+        border-radius: 4px;
+        margin-top: 3px;
+    }
+
+    .badge-available {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .badge-booked {
+        background-color: #f44336;
+        color: white;
+    }
+    .tab-container {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 25px;
+        margin-top: 0px;
+    }
+
+    .tab-button {
+        padding: 10px 10px;
+        margin: 0 1px;
+        cursor: pointer;
+        border: none;
+        background-color:blue;
+        border-radius: 4px;
+        font-size: 16px;
+        margin-right: 5px;
+        margin-top: 5px;
+    }
+
+    .tab-button.active {
+        background-color: green;
+        color: white;
+    }
+    .tab-button:last-child {
+            margin-right: 0; /* Remove margin from the last button */
+        }
+    </style>
+    
+    
+
+</body>
+</html>

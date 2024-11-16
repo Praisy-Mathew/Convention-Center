@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Full Width Calendar</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Centered Calendar</title>
     <style>
         * {
             margin: 0;
@@ -16,19 +14,23 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
 
         .calendar {
             width: 100%;
-            max-width: 100%;
-            margin: 20px auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            max-width: 1500px;
+            margin: auto;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 8px;
             background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .calendar-header {
@@ -76,7 +78,7 @@
 
         .date {
             width: 100%;
-            height: 100px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -109,6 +111,7 @@
             margin: 5% auto;
             padding: 30px;
             width: 50%;
+            max-width: 500px;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
@@ -139,14 +142,14 @@
         .form-group {
             margin: 15px 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
         }
 
         .form-group label {
             font-weight: bold;
             color: #555;
-            width: 120px;
-            margin-right: 15px;
+            margin-bottom: 8px;
         }
 
         .form-group input,
@@ -183,28 +186,9 @@
         .form-group button:hover {
             background-color: #45a049;
         }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            #modal-content {
-                width: 80%;
-            }
-
-            .form-group label {
-                width: 100px;
-            }
-
-            #calendar {
-                width: 100%;
-                max-width: 100%;
-                overflow-x: auto;
-            }
-        }
     </style>
 </head>
- 
 <body>
-    
 
     <div class="calendar">
         <div class="calendar-header">
@@ -230,19 +214,41 @@
             <!-- Dates will be populated here -->
         </div>
     </div>
-
-    <!-- Modal -->
-    <div id="modal">
+    
+    <!-- Booking Modal -->
+    <div id="modal" style="display: none;">
         <div id="modal-content">
             <span id="closeModal">&times;</span>
-            <h2 class="modal-title">Date Information</h2>
-            <div class="form-group">
-                <label for="dateInfo">Information for this date:</label>
-                <textarea id="dateInfo" rows="4" placeholder="Enter details..."></textarea>
-            </div>
-            <button onclick="saveDateInfo()">Save</button>
+            <h2 class="modal-title">Book Appointment for <span id="modal-date" style="color: #4CAF50;"></span></h2>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" required />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" required />
+                </div>
+                <div class="form-group">
+                    <label for="timeSlot">Time Slot:</label>
+                    <select id="timeSlot" required>
+                        <option value="1">10am-2:30pm</option>
+                        <option value="2">3:30pm-8pm</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Submit</button>
+                </div>
+            </form>
         </div>
     </div>
+    
+    
+    <!-- Styled Warning Popup -->
     <div id="warningModal" style="display: none;">
         <div class="warning-overlay"></div>
         <div class="warning-container">
@@ -253,46 +259,103 @@
             </div>
         </div>
     </div>
-
+    
     <script>
+        // Data for hall availability
         const availabilityData = {
-            '2024-11-10': false, // Example: unavailable date
-            '2024-11-12': true,   // Example: available date
-            '2024-11-15': false  // Another example of unavailable date
+            miniHall: {
+              
+        "2024-11-05": { morning: 'available', evening: 'booked' },
+        "2024-11-10": { morning: 'booked', evening: 'available' },
+        "2024-11-15": { morning: 'available', evening: 'available' },
+        "2024-11-18": { morning: 'booked', evening: 'available' },
+        "2024-11-23": { morning: 'available', evening: 'booked' },
+        "2024-11-28": { morning: 'available', evening: 'available' },
+        "2024-12-03": { morning: 'booked', evening: 'available' }
+            },
+            mainHall: {
+                "2024-11-07": { morning: 'booked', evening: 'available' },
+        "2024-11-12": { morning: 'available', evening: 'booked' },
+        "2024-11-20": { morning: 'booked', evening: 'available' },
+        "2024-11-22": { morning: 'available', evening: 'booked' },
+        "2024-11-25": { morning: 'available', evening: 'available' },
+        "2024-11-30": { morning: 'booked', evening: 'available' },
+        "2024-12-05": { morning: 'available', evening: 'available' }
+            }
         };
-
+    
+        let selectedDate = null;
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
+        let currentHall = 'miniHall'; // Default hall
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-        let selectedDate = null;
-
+    
         function generateCalendar() {
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const calendarContainer = document.getElementById("datesContainer");
             const monthYear = document.getElementById("monthYear");
-
-            // Clear the existing dates
+    
             calendarContainer.innerHTML = '';
-
-            // Update the month and year display
             monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
-            // Empty spaces for the first day of the month
+    
+            // Generate blank cells for days before the first day of the month
             for (let i = 0; i < firstDayOfMonth; i++) {
                 calendarContainer.innerHTML += `<div class="date"></div>`;
             }
-
-            // Populate the days of the month
+    
+            // Generate calendar dates with booking details
             for (let i = 1; i <= daysInMonth; i++) {
-                calendarContainer.innerHTML += `<div class="date" onclick="openModal(${i})">${i}</div>`;
+                const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const hallData = availabilityData[currentHall][dateKey] || null;
+                let badgesHTML = '';
+    
+                if (hallData) {
+                    // Add badges for morning and evening availability
+                    badgesHTML += hallData.morning === 'available'
+                        ? `<span class="badge badge-available">Morning Available</span>`
+                        : `<span class="badge badge-booked">Morning Booked</span>`;
+    
+                    badgesHTML += hallData.evening === 'available'
+                        ? `<span class="badge badge-available">Evening Available</span>`
+                        : `<span class="badge badge-booked">Evening Booked</span>`;
+                }
+    
+                const isBookable = hallData !== null;
+                const dateClass = isBookable ? 'date bookable' : 'date not-bookable';
+                calendarContainer.innerHTML += `<div class="${dateClass}" onclick="handleDateClick('${dateKey}')">${i}${badgesHTML}</div>`;
             }
         }
-
+    
+        function handleDateClick(date) {
+            const hallData = availabilityData[currentHall][date] || null;
+            if (!hallData) {
+                openWarningModal();
+            } else {
+                openBookingModal(date);
+            }
+        }
+    
+        function openBookingModal(date) {
+            selectedDate = date;
+            document.getElementById('modal-date').textContent = date;
+            document.getElementById('modal').style.display = 'block';
+        }
+    
+        function openWarningModal() {
+            document.getElementById('warningModal').style.display = 'block';
+        }
+    
+        function closeWarning() {
+            document.getElementById('warningModal').style.display = 'none';
+        }
+    
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    
         function changeMonth(direction) {
             currentMonth += direction;
-
             if (currentMonth > 11) {
                 currentMonth = 0;
                 currentYear++;
@@ -300,215 +363,24 @@
                 currentMonth = 11;
                 currentYear--;
             }
-
             generateCalendar();
         }
-
-        function openModal(day) {
-            selectedDate = day;
-            document.getElementById('modal').style.display = 'block';
+    
+        function switchHall(hall) {
+            currentHall = hall;
+            document.getElementById('miniHallTab').classList.remove('active');
+            document.getElementById('mainHallTab').classList.remove('active');
+            document.getElementById(`${hall}Tab`).classList.add('active');
+            generateCalendar();
         }
-
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
-
-        function saveDateInfo() {
-            const dateInfo = document.getElementById('dateInfo').value;
-            console.log(`Saved info for ${selectedDate}: ${dateInfo}`);
-            closeModal();
-        }
-
+    
         document.getElementById('closeModal').onclick = closeModal;
-
         generateCalendar();
-    </script>
-    <script>
-       
-        // Define an array with date slots
-        const data = {
-        miniHall: {
-            "2024-11-05": { morning: 'available', evening: 'booked' },
-            "2024-11-10": { morning: 'booked', evening: 'available' },
-            "2024-11-15": { morning: 'available', evening: 'available' }
-        },
-        mainHall: {
-            "2024-11-07": { morning: 'booked', evening: 'available' },
-            "2024-11-12": { morning: 'available', evening: 'booked' },
-            "2024-11-20": { morning: 'booked', evening: 'booked' }
-        }
-    };
-
-    function generateCalendar() {
-        const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-        const calendarContainer = document.getElementById("datesContainer");
-        const monthYear = document.getElementById("monthYear");
-
-        calendarContainer.innerHTML = '';
-        monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            calendarContainer.innerHTML += `<div class="date"></div>`;
-        }
-
-        for (let i = 1; i <= daysInMonth; i++) {
-            const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-            const slotData = slots[dateKey] || { morning: 'none', evening: 'none' };
-
-            let badges = '';
-            if (slotData.morning === 'available') {
-                badges += `<div class="badge badge-available">9-3 Available</div>`;
-            } else if (slotData.morning === 'booked') {
-                badges += `<div class="badge badge-booked">9-3 Booked</div>`;
-            }
-
-            if (slotData.evening === 'available') {
-                badges += `<div class="badge badge-available">4-10 Available</div>`;
-            } else if (slotData.evening === 'booked') {
-                badges += `<div class="badge badge-booked">4-10 Booked</div>`;
-            }
-
-            calendarContainer.innerHTML += `<div class="date" onclick="openModal(${i})">${i}${badges}</div>`;
-        }
-    }
-
-    function openModal(day) {
-        selectedDate = day;
-        document.getElementById('modal').style.display = 'block';
-    }
-
-    function closeModal() {
-        document.getElementById('modal').style.display = 'none';
-    }
-
-    function saveDateInfo() {
-        const dateInfo = document.getElementById('dateInfo').value;
-        console.log(`Saved info for ${selectedDate}: ${dateInfo}`);
-        closeModal();
-    }
-
-    document.getElementById('closeModal').onclick = closeModal;
-
-    //generateCalendar();
-    function generateCalendar(slots) {
-        const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-        const calendarContainer = document.getElementById("datesContainer");
-        const monthYear = document.getElementById("monthYear");
-
-        calendarContainer.innerHTML = '';
-        monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            calendarContainer.innerHTML += `<div class="date"></div>`;
-        }
-
-        for (let i = 1; i <= daysInMonth; i++) {
-            const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-            const slotData = slots[dateKey];
-            let badges = '';
-
-            if (slotData) {
-                if (slotData.morning === 'available') {
-                    badges += `<div class="badge badge-available">9-3 Available</div>`;
-                } else if (slotData.morning === 'booked') {
-                    badges += `<div class="badge badge-booked">9-3 Booked</div>`;
-                }
-
-                if (slotData.evening === 'available') {
-                    badges += `<div class="badge badge-available">4-10 Available</div>`;
-                } else if (slotData.evening === 'booked') {
-                    badges += `<div class="badge badge-booked">4-10 Booked</div>`;
-                }
-            }
-
-            calendarContainer.innerHTML += `
-                <div class="date">
-                    <div>${i}</div>
-                    ${badges}
-                </div>`;
-        }
-    }
-
-    function switchHall(hall) {
-        document.getElementById('miniHallTab').classList.remove('active');
-        document.getElementById('mainHallTab').classList.remove('active');
-         document.getElementById(`${hall}Tab`).classList.add('active');
-        generateCalendar(data[hall]);
-    }
-
-    // Initial load for Mini Hall
-     switchHall('miniHall');
+    
+        // Initial load for Mini Hall
+        switchHall('miniHall');
     </script>
     
-    <style>
-        .available {
-            background-color: #d4edda;
-            color: #155724;
-        }
-    
-        .booked {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .date {
-        width: 100%;
-        height: 80px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-        cursor: pointer;
-        position: relative;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 3px 8px;
-        font-size: 12px;
-        border-radius: 4px;
-        margin-top: 3px;
-    }
-
-    .badge-available {
-        background-color: #4CAF50;
-        color: white;
-    }
-
-    .badge-booked {
-        background-color: #f44336;
-        color: white;
-    }
-    .tab-container {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 25px;
-        margin-top: 0px;
-    }
-
-    .tab-button {
-        padding: 10px 10px;
-        margin: 0 1px;
-        cursor: pointer;
-        border: none;
-        background-color:blue;
-        border-radius: 4px;
-        font-size: 16px;
-        margin-right: 5px;
-        margin-top: 5px;
-    }
-
-    .tab-button.active {
-        background-color: green;
-        color: white;
-    }
-    .tab-button:last-child {
-            margin-right: 0; /* Remove margin from the last button */
-        }
-    </style>
     <style>
         
         .bookable { background-color: #dff0d8; } /* Available dates in green */
@@ -570,8 +442,52 @@
         .close-button:hover {
             background-color: #ff4c4c;
         }
+        .badge {
+        display: inline-block;
+        padding: 3px 8px;
+        font-size: 12px;
+        border-radius: 4px;
+        margin-top: 3px;
+    }
+
+    .badge-available {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .badge-booked {
+        background-color: #f44336;
+        color: white;
+    }
+    .tab-container {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 25px;
+        margin-top: 0px;
+    }
+
+    .tab-button {
+        padding: 10px 10px;
+        margin: 0 1px;
+        cursor: pointer;
+        border: none;
+        background-color:blue;
+        border-radius: 4px;
+        font-size: 16px;
+        margin-right: 5px;
+        margin-top: 5px;
+    }
+
+    .tab-button.active {
+        background-color: green;
+        color: white;
+    }
+    .tab-button:last-child {
+            margin-right: 0; /* Remove margin from the last button */
+        }
     </style>
     
-</body>
+    
 
-</html>  
+</body>
+</html>
