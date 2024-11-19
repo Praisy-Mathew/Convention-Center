@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family:'Poppins', sans-serif; ;
             background-color: #f7f7f7;
             display: flex;
             align-items: center;
@@ -110,7 +110,7 @@
             background: #fff;
             margin: 5% auto;
             padding: 30px;
-            width: 50%;
+            width: 90%;
             max-width: 500px;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -201,6 +201,53 @@
             <button class="tab-button active" id="miniHallTab" onclick="switchHall('miniHall')">Mini Hall</button>
             <button class="tab-button" id="mainHallTab" onclick="switchHall('mainHall')">Main Hall</button>
         </div> 
+        <div class="month-year-search">
+            <label for="monthSelect">Jump to:</label>
+            <select id="monthSelect" onchange="goToMonth()">
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10" selected>November</option>
+                <option value="11">December</option>
+            </select>
+            <input type="number" id="yearInput" value="2024" onchange="goToMonth()" style="width: 70px;" />
+            <style>
+                .month-year-search {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-left: 20px;
+                }
+            
+                #monthSelect,
+                #yearInput {
+                    padding: 5px;
+                    font-size: 14px;
+                }
+            </style>
+
+<script>
+    function goToMonth() {
+    const selectedMonth = parseInt(document.getElementById("monthSelect").value, 10);
+    const selectedYear = parseInt(document.getElementById("yearInput").value, 10);
+
+    if (!isNaN(selectedMonth) && !isNaN(selectedYear)) {
+        currentMonth = selectedMonth;
+        currentYear = selectedYear;
+        generateCalendar();
+    }
+}
+
+</script>
+        </div>
+        
         <div class="calendar-days">
             <div class="day">Sun</div>
             <div class="day">Mon</div>
@@ -260,55 +307,451 @@
         </div>
     </div>
     
-
-    <style>
-        .date {
-    cursor: pointer;
-    padding: 10px;
-    margin: 5px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.date.bookable {
-    background-color: #e7ffe7; /* Green for bookable dates */
-}
-
-.date.not-bookable {
-    background-color: #ffcccc; /* Red for non-bookable dates */
-    cursor: not-allowed;
-}
-
-.date.not-bookable:hover {
-    background-color: #ff9999;
-}
-
-    </style>
-
     <script>
         // Data for hall availability
         const availabilityData = {
             miniHall: {
-              
-        "2024-11-05": { morning: 'available', evening: 'booked' },
-        "2024-11-10": { morning: 'booked', evening: 'available' },
-        "2024-11-15": { morning: 'available', evening: 'available' },
-        "2024-11-18": { morning: 'booked', evening: 'booked' },
-        "2024-11-23": { morning: 'available', evening: 'booked' },
-        "2024-11-28": { morning: 'available', evening: 'available' },
-        "2024-12-03": { morning: 'booked', evening: 'available' }
+                // Mini Hall - 2024
+                "2024-11-05": { morning: "available", evening: "booked" },
+                "2024-11-10": { morning: "booked", evening: "available" },
+                "2024-11-15": { morning: "booked", evening: "available" },
+                "2024-11-18": { morning: "booked", evening: "available" },
+                "2024-11-23": { morning: "available", evening: "booked" },
+                "2024-11-28": { morning: "available", evening: "booked" },
+                "2024-11-07": { morning: "available", evening: "booked" },
+                "2024-11-13": { morning: "booked", evening: "available" },
+                "2024-11-25": { morning: "available", evening: "available" },
+                "2024-11-29": { morning: "booked", evening: "available" },
+                "2024-11-30": { morning: "available", evening: "available" },
+                "2024-11-01": { morning: "booked", evening: "available" },
+                "2024-12-01": { morning: "booked", evening: "available" },
+                "2024-12-05": { morning: "available", evening: "booked" },
+                "2024-12-08": { morning: "available", evening: "booked" },
+                "2024-12-10": { morning: "booked", evening: "available" },
+                "2024-12-15": { morning: "available", evening: "booked" },
+                "2024-12-20": { morning: "booked", evening: "available" },
+                "2024-12-23": { morning: "available", evening: "booked" },
+                "2024-12-25": { morning: "booked", evening: "available" },
+                "2024-12-28": { morning: "available", evening: "available" },
+        
+                // Mini Hall - 2025
+                "2025-01-03": { morning: "available", evening: "booked" },
+                "2025-01-05": { morning: "booked", evening: "available" },
+                "2025-01-10": { morning: "available", evening: "available" },
+                "2025-01-15": { morning: "available", evening: "booked" },
+                "2025-01-20": { morning: "booked", evening: "available" },
+                "2025-01-25": { morning: "available", evening: "booked" },
+                "2025-01-02": { morning: "available", evening: "booked" },
+                "2025-01-05": { morning: "available", evening: "available" },
+                "2025-01-08": { morning: "booked", evening: "available" },
+                "2025-01-10": { morning: "available", evening: "booked" },
+                "2025-01-15": { morning: "available", evening: "available" },
+                "2025-01-18": { morning: "booked", evening: "booked" },
+                "2025-01-20": { morning: "available", evening: "available" },
+                "2025-01-25": { morning: "booked", evening: "booked" },
+                "2025-01-28": { morning: "available", evening: "available" },
+
+                "2025-02-03": { morning: "available", evening: "booked" },
+                "2025-02-05": { morning: "booked", evening: "available" },
+                "2025-02-10": { morning: "available", evening: "available" },
+                "2025-02-15": { morning: "available", evening: "booked" },
+                "2025-02-20": { morning: "booked", evening: "available" },
+                "2025-02-25": { morning: "available", evening: "booked" },
+                "2025-02-02": { morning: "available", evening: "booked" },
+                "2025-02-05": { morning: "available", evening: "available" },
+                "2025-02-08": { morning: "booked", evening: "available" },
+                "2025-02-10": { morning: "available", evening: "booked" },
+                "2025-02-15": { morning: "available", evening: "available" },
+                "2025-02-18": { morning: "booked", evening: "booked" },
+                "2025-02-20": { morning: "available", evening: "available" },
+                "2025-02-25": { morning: "booked", evening: "booked" },
+                "2025-02-28": { morning: "available", evening: "available" },
+        
+                "2025-03-03": { morning: "available", evening: "booked" },
+                "2025-03-05": { morning: "booked", evening: "available" },
+                "2025-03-10": { morning: "available", evening: "available" },
+                "2025-03-15": { morning: "available", evening: "booked" },
+                "2025-03-20": { morning: "booked", evening: "available" },
+                "2025-03-25": { morning: "available", evening: "booked" },
+                "2025-03-02": { morning: "available", evening: "booked" },
+                "2025-03-05": { morning: "available", evening: "available" },
+                "2025-03-08": { morning: "booked", evening: "available" },
+                "2025-03-10": { morning: "available", evening: "booked" },
+                "2025-03-15": { morning: "available", evening: "available" },
+                "2025-03-18": { morning: "booked", evening: "booked" },
+                "2025-03-20": { morning: "available", evening: "available" },
+                "2025-03-25": { morning: "booked", evening: "booked" },
+                "2025-03-28": { morning: "available", evening: "available" },
+
+                "2025-04-03": { morning: "available", evening: "booked" },
+                "2025-04-05": { morning: "booked", evening: "available" },
+                "2025-04-10": { morning: "available", evening: "available" },
+                "2025-04-15": { morning: "available", evening: "booked" },
+                "2025-04-20": { morning: "booked", evening: "available" },
+                "2025-04-25": { morning: "available", evening: "booked" },
+                "2025-04-02": { morning: "available", evening: "booked" },
+                "2025-04-05": { morning: "available", evening: "available" },
+                "2025-04-08": { morning: "booked", evening: "available" },
+                "2025-04-10": { morning: "available", evening: "booked" },
+                "2025-04-15": { morning: "available", evening: "available" },
+                "2025-04-18": { morning: "booked", evening: "booked" },
+                "2025-04-20": { morning: "available", evening: "available" },
+                "2025-04-25": { morning: "booked", evening: "booked" },
+                "2025-04-28": { morning: "available", evening: "available" },
+
+                "2025-05-03": { morning: "available", evening: "booked" },
+                "2025-05-05": { morning: "booked", evening: "available" },
+                "2025-05-10": { morning: "available", evening: "available" },
+                "2025-05-15": { morning: "available", evening: "booked" },
+                "2025-05-20": { morning: "booked", evening: "available" },
+                "2025-05-25": { morning: "available", evening: "booked" },
+                "2025-05-02": { morning: "available", evening: "booked" },
+                "2025-05-05": { morning: "available", evening: "available" },
+                "2025-05-08": { morning: "booked", evening: "available" },
+                "2025-05-10": { morning: "available", evening: "booked" },
+                "2025-05-15": { morning: "available", evening: "available" },
+                "2025-05-18": { morning: "booked", evening: "booked" },
+                "2025-05-20": { morning: "available", evening: "available" },
+                "2025-05-25": { morning: "booked", evening: "booked" },
+                "2025-05-28": { morning: "available", evening: "available" },
+                // Additional months for 2025...
+
+                "2025-06-03": { morning: "available", evening: "booked" },
+                "2025-06-05": { morning: "booked", evening: "available" },
+                "2025-01-10": { morning: "available", evening: "available" },
+                "2025-06-15": { morning: "available", evening: "booked" },
+                "2025-06-20": { morning: "booked", evening: "available" },
+                "2025-06-25": { morning: "available", evening: "booked" },
+                "2025-06-02": { morning: "available", evening: "booked" },
+                "2025-06-05": { morning: "available", evening: "available" },
+                "2025-06-08": { morning: "booked", evening: "available" },
+                "2025-06-10": { morning: "available", evening: "booked" },
+                "2025-06-15": { morning: "available", evening: "available" },
+                "2025-06-18": { morning: "booked", evening: "booked" },
+                "2025-06-20": { morning: "available", evening: "available" },
+                "2025-06-25": { morning: "booked", evening: "booked" },
+                "2025-06-28": { morning: "available", evening: "available" },
+
+                "2025-07-03": { morning: "available", evening: "booked" },
+                "2025-07-05": { morning: "booked", evening: "available" },
+                "2025-07-10": { morning: "available", evening: "available" },
+                "2025-07-15": { morning: "available", evening: "booked" },
+                "2025-07-20": { morning: "booked", evening: "available" },
+                "2025-07-25": { morning: "available", evening: "booked" },
+                "2025-07-02": { morning: "available", evening: "booked" },
+                "2025-07-05": { morning: "available", evening: "available" },
+                "2025-07-08": { morning: "booked", evening: "available" },
+                "2025-07-10": { morning: "available", evening: "booked" },
+                "2025-07-15": { morning: "available", evening: "available" },
+                "2025-07-18": { morning: "booked", evening: "booked" },
+                "2025-07-20": { morning: "available", evening: "available" },
+                "2025-07-25": { morning: "booked", evening: "booked" },
+                "2025-07-28": { morning: "available", evening: "available" },
+
+                "2025-08-03": { morning: "available", evening: "booked" },
+                "2025-08-05": { morning: "booked", evening: "available" },
+                "2025-08-10": { morning: "available", evening: "available" },
+                "2025-08-15": { morning: "available", evening: "booked" },
+                "2025-08-20": { morning: "booked", evening: "available" },
+                "2025-08-25": { morning: "available", evening: "booked" },
+                "2025-08-02": { morning: "available", evening: "booked" },
+                "2025-08-05": { morning: "available", evening: "available" },
+                "2025-08-08": { morning: "booked", evening: "available" },
+                "2025-08-10": { morning: "available", evening: "booked" },
+                "2025-08-15": { morning: "available", evening: "available" },
+                "2025-08-18": { morning: "booked", evening: "booked" },
+                "2025-08-20": { morning: "available", evening: "available" },
+                "2025-08-25": { morning: "booked", evening: "booked" },
+                "2025-08-28": { morning: "available", evening: "available" },
+
+                "2025-09-03": { morning: "available", evening: "booked" },
+                "2025-09-05": { morning: "booked", evening: "available" },
+                "2025-09-10": { morning: "available", evening: "available" },
+                "2025-09-15": { morning: "available", evening: "booked" },
+                "2025-09-20": { morning: "booked", evening: "available" },
+                "2025-09-25": { morning: "available", evening: "booked" },
+                "2025-09-02": { morning: "available", evening: "booked" },
+                "2025-09-05": { morning: "available", evening: "available" },
+                "2025-09-08": { morning: "booked", evening: "available" },
+                "2025-09-10": { morning: "available", evening: "booked" },
+                "2025-09-15": { morning: "available", evening: "available" },
+                "2025-09-18": { morning: "booked", evening: "booked" },
+                "2025-09-20": { morning: "available", evening: "available" },
+                "2025-09-25": { morning: "booked", evening: "booked" },
+                "2025-09-28": { morning: "available", evening: "available" },
+
+                "2025-10-03": { morning: "available", evening: "booked" },
+                "2025-10-05": { morning: "booked", evening: "available" },
+                "2025-10-10": { morning: "available", evening: "available" },
+                "2025-10-15": { morning: "available", evening: "booked" },
+                "2025-10-20": { morning: "booked", evening: "available" },
+                "2025-10-25": { morning: "available", evening: "booked" },
+                "2025-10-02": { morning: "available", evening: "booked" },
+                "2025-10-05": { morning: "available", evening: "available" },
+                "2025-10-08": { morning: "booked", evening: "available" },
+                "2025-10-10": { morning: "available", evening: "booked" },
+                "2025-10-15": { morning: "available", evening: "available" },
+                "2025-10-18": { morning: "booked", evening: "booked" },
+                "2025-10-20": { morning: "available", evening: "available" },
+                "2025-10-25": { morning: "booked", evening: "booked" },
+                "2025-10-28": { morning: "available", evening: "available" },
+
+                "2025-11-03": { morning: "available", evening: "booked" },
+                "2025-11-05": { morning: "booked", evening: "available" },
+                "2025-11-10": { morning: "available", evening: "available" },
+                "2025-11-15": { morning: "available", evening: "booked" },
+                "2025-11-20": { morning: "booked", evening: "available" },
+                "2025-11-25": { morning: "available", evening: "booked" },
+                "2025-11-02": { morning: "available", evening: "booked" },
+                "2025-11-05": { morning: "available", evening: "available" },
+                "2025-11-08": { morning: "booked", evening: "available" },
+                "2025-11-10": { morning: "available", evening: "booked" },
+                "2025-11-15": { morning: "available", evening: "available" },
+                "2025-11-18": { morning: "booked", evening: "booked" },
+                "2025-11-20": { morning: "available", evening: "available" },
+                "2025-11-25": { morning: "booked", evening: "booked" },
+                "2025-11-28": { morning: "available", evening: "available" },
+
+                "2025-12-03": { morning: "available", evening: "booked" },
+                "2025-12-05": { morning: "booked", evening: "available" },
+                "2025-12-10": { morning: "available", evening: "available" },
+                "2025-12-15": { morning: "available", evening: "booked" },
+                "2025-12-20": { morning: "booked", evening: "available" },
+                "2025-12-25": { morning: "available", evening: "booked" },
+                "2025-12-02": { morning: "available", evening: "booked" },
+                "2025-12-05": { morning: "available", evening: "available" },
+                "2025-12-08": { morning: "booked", evening: "available" },
+                "2025-12-10": { morning: "available", evening: "booked" },
+                "2025-12-15": { morning: "available", evening: "available" },
+                "2025-12-18": { morning: "booked", evening: "booked" },
+                "2025-12-20": { morning: "available", evening: "available" },
+                "2025-12-25": { morning: "booked", evening: "booked" },
+                "2025-12-28": { morning: "available", evening: "available" },
             },
+
             mainHall: {
-                "2024-11-07": { morning: 'booked', evening: 'available' },
-        "2024-11-12": { morning: 'available', evening: 'booked' },
-        "2024-11-20": { morning: 'booked', evening: 'available' },
-        "2024-11-22": { morning: 'available', evening: 'booked' },
-        "2024-11-25": { morning: 'available', evening: 'available' },
-        "2024-11-30": { morning: 'booked', evening: 'available' },
-        "2024-12-05": { morning: 'available', evening: 'available' }
+                // Main Hall - 2024
+                "2024-11-07": { morning: "booked", evening: "available" },
+                "2024-11-12": { morning: "available", evening: "booked" },
+                "2024-11-17": { morning: "booked", evening: "available" },
+                "2024-11-22": { morning: "available", evening: "booked" },
+                "2024-11-27": { morning: "available", evening: "available" },
+                "2024-11-10": { morning: "booked", evening: "available" },
+                "2024-11-26": { morning: "available", evening: "booked" },
+                "2024-11-02": { morning: "booked", evening: "available" },
+                "2024-11-29": { morning: "available", evening: "booked" },
+                "2024-11-30": { morning: "available", evening: "available" },
+
+                "2024-12-01": { morning: "available", evening: "booked" },
+                "2024-12-04": { morning: "available", evening: "available" },
+                "2024-12-09": { morning: "booked", evening: "available" },
+                "2024-12-11": { morning: "available", evening: "booked" },
+                "2024-12-14": { morning: "available", evening: "available" },
+                "2024-12-17": { morning: "booked", evening: "available" },
+                "2024-12-20": { morning: "available", evening: "booked" },
+                "2024-12-24": { morning: "booked", evening: "booked" },
+                "2024-12-26": { morning: "available", evening: "available" },
+                "2024-12-30": { morning: "booked", evening: "booked" },
+        
+                // Main Hall - 2025
+                "2025-01-02": { morning: "available", evening: "booked" },
+                "2025-01-06": { morning: "booked", evening: "available" },
+                "2025-01-09": { morning: "available", evening: "available" },
+                "2025-01-14": { morning: "booked", evening: "booked" },
+                "2025-01-18": { morning: "available", evening: "available" },
+                "2025-01-22": { morning: "booked", evening: "available" },
+                "2025-01-26": { morning: "available", evening: "available" },
+                "2025-01-01": { morning: "booked", evening: "booked" },
+                "2025-01-04": { morning: "available", evening: "available" },
+                "2025-01-07": { morning: "booked", evening: "booked" },
+                "2025-01-11": { morning: "available", evening: "available" },
+                "2025-01-13": { morning: "booked", evening: "available" },
+                "2025-01-17": { morning: "available", evening: "available" },
+                "2025-01-23": { morning: "booked", evening: "booked" },
+                "2025-01-27": { morning: "available", evening: "available" },
+        
+                "2025-02-02": { morning: "available", evening: "booked" },
+                "2025-02-06": { morning: "booked", evening: "available" },
+                "2025-02-09": { morning: "available", evening: "available" },
+                "2025-02-14": { morning: "booked", evening: "booked" },
+                "2025-02-18": { morning: "available", evening: "available" },
+                "2025-02-22": { morning: "booked", evening: "available" },
+                "2025-02-26": { morning: "available", evening: "available" },
+                "2025-02-01": { morning: "booked", evening: "booked" },
+                "2025-02-04": { morning: "available", evening: "available" },
+                "2025-02-07": { morning: "booked", evening: "booked" },
+                "2025-02-11": { morning: "available", evening: "available" },
+                "2025-02-13": { morning: "booked", evening: "available" },
+                "2025-02-17": { morning: "available", evening: "available" },
+                "2025-02-23": { morning: "booked", evening: "booked" },
+                "2025-02-27": { morning: "available", evening: "available" },
+
+                "2025-03-02": { morning: "available", evening: "booked" },
+                "2025-03-06": { morning: "booked", evening: "available" },
+                "2025-03-09": { morning: "available", evening: "available" },
+                "2025-03-14": { morning: "booked", evening: "booked" },
+                "2025-03-18": { morning: "available", evening: "available" },
+                "2025-03-22": { morning: "booked", evening: "available" },
+                "2025-03-26": { morning: "available", evening: "available" },
+                "2025-03-01": { morning: "booked", evening: "booked" },
+                "2025-03-04": { morning: "available", evening: "available" },
+                "2025-03-07": { morning: "booked", evening: "booked" },
+                "2025-03-11": { morning: "available", evening: "available" },
+                "2025-03-13": { morning: "booked", evening: "available" },
+                "2025-03-17": { morning: "available", evening: "available" },
+                "2025-03-23": { morning: "booked", evening: "booked" },
+                "2025-03-27": { morning: "available", evening: "available" },
+                // Additional months for 2025...
+
+                "2025-04-02": { morning: "available", evening: "booked" },
+                "2025-04-06": { morning: "booked", evening: "available" },
+                "2025-04-09": { morning: "available", evening: "available" },
+                "2025-04-14": { morning: "booked", evening: "booked" },
+                "2025-04-18": { morning: "available", evening: "available" },
+                "2025-04-22": { morning: "booked", evening: "available" },
+                "2025-04-26": { morning: "available", evening: "available" },
+                "2025-04-01": { morning: "booked", evening: "booked" },
+                "2025-04-04": { morning: "available", evening: "available" },
+                "2025-04-07": { morning: "booked", evening: "booked" },
+                "2025-04-11": { morning: "available", evening: "available" },
+                "2025-04-13": { morning: "booked", evening: "available" },
+                "2025-04-17": { morning: "available", evening: "available" },
+                "2025-04-23": { morning: "booked", evening: "booked" },
+                "2025-04-27": { morning: "available", evening: "available" },
+
+
+                "2025-05-02": { morning: "available", evening: "booked" },
+                "2025-05-06": { morning: "booked", evening: "available" },
+                "2025-05-09": { morning: "available", evening: "available" },
+                "2025-05-14": { morning: "booked", evening: "booked" },
+                "2025-05-18": { morning: "available", evening: "available" },
+                "2025-05-22": { morning: "booked", evening: "available" },
+                "2025-05-26": { morning: "available", evening: "available" },
+                "2025-05-01": { morning: "booked", evening: "booked" },
+                "2025-05-04": { morning: "available", evening: "available" },
+                "2025-05-07": { morning: "booked", evening: "booked" },
+                "2025-05-11": { morning: "available", evening: "available" },
+                "2025-05-13": { morning: "booked", evening: "available" },
+                "2025-05-17": { morning: "available", evening: "available" },
+                "2025-05-23": { morning: "booked", evening: "booked" },
+                "2025-05-27": { morning: "available", evening: "available" },
+
+
+
+                "2025-06-02": { morning: "available", evening: "booked" },
+                "2025-06-06": { morning: "booked", evening: "available" },
+                "2025-06-09": { morning: "available", evening: "available" },
+                "2025-06-14": { morning: "booked", evening: "booked" },
+                "2025-06-18": { morning: "available", evening: "available" },
+                "2025-06-22": { morning: "booked", evening: "available" },
+                "2025-06-26": { morning: "available", evening: "available" },
+                "2025-06-01": { morning: "booked", evening: "booked" },
+                "2025-06-04": { morning: "available", evening: "available" },
+                "2025-06-07": { morning: "booked", evening: "booked" },
+                "2025-06-11": { morning: "available", evening: "available" },
+                "2025-06-13": { morning: "booked", evening: "available" },
+                "2025-06-17": { morning: "available", evening: "available" },
+                "2025-06-23": { morning: "booked", evening: "booked" },
+                "2025-06-27": { morning: "available", evening: "available" },
+
+                "2025-07-02": { morning: "available", evening: "booked" },
+                "2025-07-06": { morning: "booked", evening: "available" },
+                "2025-07-09": { morning: "available", evening: "available" },
+                "2025-07-14": { morning: "booked", evening: "booked" },
+                "2025-07-18": { morning: "available", evening: "available" },
+                "2025-07-22": { morning: "booked", evening: "available" },
+                "2025-07-26": { morning: "available", evening: "available" },
+                "2025-07-01": { morning: "booked", evening: "booked" },
+                "2025-07-04": { morning: "available", evening: "available" },
+                "2025-07-07": { morning: "booked", evening: "booked" },
+                "2025-07-11": { morning: "available", evening: "available" },
+                "2025-07-13": { morning: "booked", evening: "available" },
+                "2025-07-17": { morning: "available", evening: "available" },
+                "2025-07-23": { morning: "booked", evening: "booked" },
+                "2025-07-27": { morning: "available", evening: "available" },
+
+                "2025-08-02": { morning: "available", evening: "booked" },
+                "2025-08-06": { morning: "booked", evening: "available" },
+                "2025-08-09": { morning: "available", evening: "available" },
+                "2025-08-14": { morning: "booked", evening: "booked" },
+                "2025-08-18": { morning: "available", evening: "available" },
+                "2025-08-14": { morning: "booked", evening: "available" },
+                "2025-08-26": { morning: "available", evening: "available" },
+                "2025-08-01": { morning: "booked", evening: "booked" },
+                "2025-08-04": { morning: "available", evening: "available" },
+                "2025-08-07": { morning: "booked", evening: "booked" },
+                "2025-08-11": { morning: "available", evening: "available" },
+                "2025-08-13": { morning: "booked", evening: "available" },
+                "2025-08-17": { morning: "available", evening: "available" },
+                "2025-08-23": { morning: "booked", evening: "booked" },
+                "2025-08-27": { morning: "available", evening: "available" },
+
+                "2025-09-02": { morning: "available", evening: "booked" },
+                "2025-09-06": { morning: "booked", evening: "available" },
+                "2025-09-09": { morning: "available", evening: "available" },
+                "2025-09-14": { morning: "booked", evening: "booked" },
+                "2025-09-18": { morning: "available", evening: "available" },
+                "2025-09-22": { morning: "booked", evening: "available" },
+                "2025-09-26": { morning: "available", evening: "available" },
+                "2025-09-01": { morning: "booked", evening: "booked" },
+                "2025-09-04": { morning: "available", evening: "available" },
+                "2025-09-07": { morning: "booked", evening: "booked" },
+                "2025-09-11": { morning: "available", evening: "available" },
+                "2025-09-13": { morning: "booked", evening: "available" },
+                "2025-09-17": { morning: "available", evening: "available" },
+                "2025-09-23": { morning: "booked", evening: "booked" },
+                "2025-09-27": { morning: "available", evening: "available" },
+
+                "2025-10-02": { morning: "available", evening: "booked" },
+                "2025-10-06": { morning: "booked", evening: "available" },
+                "2025-10-09": { morning: "available", evening: "available" },
+                "2025-10-14": { morning: "booked", evening: "booked" },
+                "2025-10-18": { morning: "available", evening: "available" },
+                "2025-10-22": { morning: "booked", evening: "available" },
+                "2025-10-26": { morning: "available", evening: "available" },
+                "2025-10-01": { morning: "booked", evening: "booked" },
+                "2025-10-04": { morning: "available", evening: "available" },
+                "2025-10-07": { morning: "booked", evening: "booked" },
+                "2025-10-11": { morning: "available", evening: "available" },
+                "2025-10-13": { morning: "booked", evening: "available" },
+                "2025-10-17": { morning: "available", evening: "available" },
+                "2025-10-23": { morning: "booked", evening: "booked" },
+                "2025-10-27": { morning: "available", evening: "available" },
+
+                "2025-11-02": { morning: "available", evening: "booked" },
+                "2025-11-06": { morning: "booked", evening: "available" },
+                "2025-11-09": { morning: "available", evening: "available" },
+                "2025-11-14": { morning: "booked", evening: "booked" },
+                "2025-11-18": { morning: "available", evening: "available" },
+                "2025-11-22": { morning: "booked", evening: "available" },
+                "2025-11-26": { morning: "available", evening: "available" },
+                "2025-11-01": { morning: "booked", evening: "booked" },
+                "2025-11-04": { morning: "available", evening: "available" },
+                "2025-11-07": { morning: "booked", evening: "booked" },
+                "2025-11-11": { morning: "available", evening: "available" },
+                "2025-11-13": { morning: "booked", evening: "available" },
+                "2025-11-17": { morning: "available", evening: "available" },
+                "2025-11-23": { morning: "booked", evening: "booked" },
+                "2025-11-27": { morning: "available", evening: "available" },
+
+                "2025-12-02": { morning: "available", evening: "booked" },
+                "2025-12-06": { morning: "booked", evening: "available" },
+                "2025-12-09": { morning: "available", evening: "available" },
+                "2025-12-14": { morning: "booked", evening: "booked" },
+                "2025-12-18": { morning: "available", evening: "available" },
+                "2025-12-22": { morning: "booked", evening: "available" },
+                "2025-12-26": { morning: "available", evening: "available" },
+                "2025-12-01": { morning: "booked", evening: "booked" },
+                "2025-12-04": { morning: "available", evening: "available" },
+                "2025-12-07": { morning: "booked", evening: "booked" },
+                "2025-12-11": { morning: "available", evening: "available" },
+                "2025-12-13": { morning: "booked", evening: "available" },
+                "2025-12-17": { morning: "available", evening: "available" },
+                "2025-12-23": { morning: "booked", evening: "booked" },
+                "2025-12-27": { morning: "available", evening: "available" },
             }
         };
+        
     
         let selectedDate = null;
         let currentMonth = new Date().getMonth();
@@ -317,76 +760,50 @@
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     
         function generateCalendar() {
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const calendarContainer = document.getElementById("datesContainer");
-    const monthYear = document.getElementById("monthYear");
-
-    calendarContainer.innerHTML = '';
-    monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
-    // Generate blank cells for days before the first day of the month
-    for (let i = 0; i < firstDayOfMonth; i++) {
-        calendarContainer.innerHTML += `<div class="date"></div>`;
-    }
-
-    // Generate calendar dates with booking details
-    for (let i = 1; i <= daysInMonth; i++) {
-        const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        const hallData = availabilityData[currentHall][dateKey] || null;
-        let badgesHTML = '';
-
-        let isBookable = true; // Default to bookable
-        let isWarning = false; // Default to no warning
-
-        if (hallData) {
-            // Add badges for morning and evening availability
-            badgesHTML += hallData.morning === 'available'
-                ? `<span class="badge badge-available">Morning Available</span>`
-                : `<span class="badge badge-booked">Morning Booked</span>`;
-
-            badgesHTML += hallData.evening === 'available'
-                ? `<span class="badge badge-available">Evening Available</span>`
-                : `<span class="badge badge-booked">Evening Booked</span>`;
-
-            // Check if both slots are booked
-            if (hallData.morning === 'booked' && hallData.evening === 'booked') {
-                isBookable = false;
-                isWarning = true;
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const calendarContainer = document.getElementById("datesContainer");
+            const monthYear = document.getElementById("monthYear");
+    
+            calendarContainer.innerHTML = '';
+            monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    
+            // Generate blank cells for days before the first day of the month
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                calendarContainer.innerHTML += `<div class="date"></div>`;
+            }
+    
+            // Generate calendar dates with booking details
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const hallData = availabilityData[currentHall][dateKey] || null;
+                let badgesHTML = '';
+    
+                if (hallData) {
+                    // Add badges for morning and evening availability
+                    badgesHTML += hallData.morning === 'available'
+                        ? `<span class="badge badge-available"> 9AM-3PM-Available</span>`
+                        : `<span class="badge badge-booked"> 9AM-3PM-Booked</span>`;
+    
+                    badgesHTML += hallData.evening === 'available'
+                        ? `<span class="badge badge-available">4PM-10PM-Available</span>`
+                        : `<span class="badge badge-booked">4PM-10PM-Booked</span>`;
+                }
+    
+                const isBookable = hallData !== null;
+                const dateClass = isBookable ? 'date bookable' : 'date not-bookable';
+                calendarContainer.innerHTML += `<div class="${dateClass}" onclick="handleDateClick('${dateKey}')">${i}${badgesHTML}</div>`;
             }
         }
-
-        const dateClass = isBookable ? 'date bookable' : 'date not-bookable';
-        const onClickHandler = isWarning
-            ? `showWarningPopup('${dateKey}')`
-            : `handleDateClick('${dateKey}')`;
-
-        calendarContainer.innerHTML += `
-            <div class="${dateClass}" onclick="${isBookable || isWarning ? onClickHandler : ''}">
-                ${i}${badgesHTML}
-            </div>`;
-    }
-}
-
-// Show the modal for bookable dates
-function handleDateClick(dateKey) {
-    // Open the booking modal
-    const modal = document.getElementById("modal");
-    modal.style.display = "block";
-
-    // Populate modal with selected date (customize as needed)
-    document.getElementById("selectedDate").textContent = dateKey;
-}
-
-// Show the warning modal for non-bookable dates
-function showWarningPopup(dateKey) {
-    const warningModal = document.getElementById("warningModal");
-    warningModal.style.display = "block";
-
-    // Optionally, show the date in the warning modal
-    document.getElementById("warningDate").textContent = dateKey;
-}
-
+    
+        function handleDateClick(date) {
+            const hallData = availabilityData[currentHall][date] || null;
+            if (!hallData) {
+                openWarningModal();
+            } else {
+                openBookingModal(date);
+            }
+        }
         function openBookingModal(date) {
             selectedDate = date;
             const hallData = availabilityData[currentHall][date] || null;
@@ -401,14 +818,14 @@ function showWarningPopup(dateKey) {
                 if (hallData.morning === 'available') {
                     const morningOption = document.createElement('option');
                     morningOption.value = '1';
-                    morningOption.textContent = '10am-2:30pm';
+                    morningOption.textContent = '9am-3pm';
                     timeSlotSelect.appendChild(morningOption);
                 }
         
                 if (hallData.evening === 'available') {
                     const eveningOption = document.createElement('option');
                     eveningOption.value = '2';
-                    eveningOption.textContent = '3:30pm-8pm';
+                    eveningOption.textContent = '4pm-10pm';
                     timeSlotSelect.appendChild(eveningOption);
                 }
         
@@ -463,6 +880,7 @@ function showWarningPopup(dateKey) {
         // Initial load for Mini Hall
         switchHall('miniHall');
 
+        
 
     </script>
     
@@ -471,21 +889,43 @@ function showWarningPopup(dateKey) {
             display: flex;
             flex-direction: column; /* Arrange content vertically */
             align-items: center; /* Center-align content horizontally */
-            justify-content: center; /* Center-align content vertically */
+            justify-content: flex-start; /* Center-align content vertically */
             height: 80px; /* Adjust the height as needed */
             border: 0px solid #ccc;
             margin: 2px;
-            position: relative;
+            /* position: relative; */
             font-size: 14px;
-            overflow: hidden; /* Ensures badges stay within the cell */
+            overflow: hidden; 
             cursor: pointer;
             border-radius: 10px;
             font-size: 17px;
-
+            overflow-x: auto;
+            overflow-y: hidden; /* Enable vertical scrolling if the content overflows */
+            padding: 5px 10px;
+           
         }
+      
+        @media (max-width: 768px) {
+    .date {
+        width: 100%; /* Increase the date box width to fill the container */
+        height: 120px;
+        flex-direction: row; /* Arrange badges in a row */
+        flex-wrap: wrap; /* Allow badges to wrap */
+        justify-content: center; /* Center the badges */
+        padding: 5px; /* Adjust padding as needed */
+    }
+
+    .date .badge {
+        width: calc(80% - 1px); /* Adjust badge width to fit within the date box */
+        margin: 2px; /* Adjust margin for balanced spacing */
+        font-size: 11px; /* Slightly reduce font size to fit text */
+        padding: 2px 4px; /* Adjust padding to reduce overall badge size */
+        white-space: normal; /* Allow text to wrap within the badge */
+    }
+}
         
         .badge {
-            display: block;
+            display: inline-block;
             padding: 3px 6px;
             margin: 2px 0; /* Vertical spacing between badges */
             font-size: 12px;
@@ -493,7 +933,9 @@ function showWarningPopup(dateKey) {
             text-align: center;
             color: #fff;
             white-space: nowrap; /* Prevent badges from wrapping */
+            
         }
+        
         
         .badge-available {
             background-color: #28a745; /* Green for available */
@@ -575,6 +1017,7 @@ function showWarningPopup(dateKey) {
         font-size: 12px;
         border-radius: 4px;
         margin-top: 3px;
+        -webkit-overflow-scrolling: touch;
     }
 
     .badge-available {
@@ -598,7 +1041,7 @@ function showWarningPopup(dateKey) {
         margin: 0 1px;
         cursor: pointer;
         border: none;
-        background-color:blue;
+        background-color:skyblue;
         border-radius: 4px;
         font-size: 16px;
         margin-right: 5px;
@@ -606,7 +1049,7 @@ function showWarningPopup(dateKey) {
     }
 
     .tab-button.active {
-        background-color: green;
+        background-color: rgb(54, 138, 54);
         color: white;
     }
     .tab-button:last-child {
