@@ -838,6 +838,8 @@
     
                 const isBookable = hallData !== null;
                 const dateClass = isBookable ? 'date bookable' : 'date not-bookable';
+               
+
                 calendarContainer.innerHTML += `<div class="${dateClass}" onclick="handleDateClick('${dateKey}')">${i}${badgesHTML}</div>`;
             }
         }
